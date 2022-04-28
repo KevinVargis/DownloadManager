@@ -26,10 +26,14 @@ def download(url, start, this_chunk_size, part, tmp_dir):
 		for chunk in r.iter_content(chunk_size=1024):
 			if chunk:
 				f.write(chunk)
+	# f = open(os.path.join(tmp_dir, '_%d' % part + 'done'), "wb")
+	# f.write("Now the file has more content!")
 	print( 'Downloaded %s' % filepath)
 
 def downloader(url): #, dl_dir):
 	# check if URL accept ranges
+	if(url == ''):
+		return
 	tmp_dir = dl_dir + '/tmp'
 	if os.path.isdir(tmp_dir):
 		shutil.rmtree(tmp_dir)	
@@ -38,8 +42,14 @@ def downloader(url): #, dl_dir):
 	
 	accept_ranges = 'accept-ranges' in r.headers and 'bytes' in r.headers['accept-ranges']
 	if not accept_ranges:
-		return 'URL does not accept byte ranges.'
-		quit()
+		r = requests.get(url, stream=True)
+		filename = get_filename_from_url(url)
+		filepath = os.path.join(dl_dir, filename)
+		with open(filepath, 'wb') as f:
+			for chunk in r.iter_content(chunk_size=1024):
+				if chunk:
+					f.write(chunk)
+		return( 'Downloaded %s' % filepath)
 
 	# download chunks
 	size = int(r.headers['Content-Length'])
@@ -58,6 +68,7 @@ def downloader(url): #, dl_dir):
 	print("waiting on merge")
 	# merge into a single file
 	while threading.active_count() > 1:
+	# while(len([name for name in os.listdir(tmp_dir) if os.path.isfile(os.path.join(tmp_dir, name))]) < conns*2):
 		time.sleep(0.1)
 
 	print('All parts downloaded. Joining files...')
@@ -75,5 +86,12 @@ def downloader(url): #, dl_dir):
 	shutil.rmtree(tmp_dir)
 
 	return 'Joining complete. File saved in ' + filepath
+
+def download_links(urls):
+	url_list = [boi.strip() for boi in urls.split(',')]
+	for boi in url_list:
+		downloader(boi)
+	print("Downloads completed!")
+	return "Downloads completed!"
 
 print("hoo")

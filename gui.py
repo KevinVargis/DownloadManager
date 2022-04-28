@@ -95,7 +95,7 @@ while True:
         # print("window done")
         #     continue
         # print(scale,k)
-        response = downloadacc.downloader(values["sigmaR"])
+        response = downloadacc.download_links(values["sigmaR"])
         popup(response, "Result")
         values["sigmaR"] = ""
         # print("Hello World")
