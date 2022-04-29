@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import downloadacc
+import testing
 sg.theme("DarkTeal2")
 column_to_be_centered = [[sg.T("")], [sg.Text("Enter URL of file to be downloaded"), sg.Input(key="sigmaR" ,change_submits=True)],
                             # [sg.T("")], [sg.Text("Choose Download Location: "), sg.Input(), sg.FileBrowse(key="path")],
@@ -95,7 +96,7 @@ while True:
         # print("window done")
         #     continue
         # print(scale,k)
-        response = downloadacc.download_links(values["sigmaR"])
+        response = testing.test(values["sigmaR"])
         popup(response, "Result")
         values["sigmaR"] = ""
         # print("Hello World")

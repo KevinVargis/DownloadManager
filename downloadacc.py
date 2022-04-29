@@ -9,7 +9,7 @@ import os
 import shutil
 
 # url = sys.argv[1]
-conns = 8
+# conns = 2
 dl_dir = os.getcwd()
 
 
@@ -30,7 +30,7 @@ def download(url, start, this_chunk_size, part, tmp_dir):
 	# f.write("Now the file has more content!")
 	print( 'Downloaded %s' % filepath)
 
-def downloader(url): #, dl_dir):
+def downloader(url,conns): #, dl_dir):
 	# check if URL accept ranges
 	if(url == ''):
 		return
@@ -87,11 +87,14 @@ def downloader(url): #, dl_dir):
 
 	return 'Joining complete. File saved in ' + filepath
 
-def download_links(urls):
+def download_links(urls,conns):
+	# start = time.time()
 	url_list = [boi.strip() for boi in urls.split(',')]
 	for boi in url_list:
-		downloader(boi)
+		downloader(boi,conns)
 	print("Downloads completed!")
+	# end=time.time()
+	# print("Total time taken for download ",end-start)
 	return "Downloads completed!"
 
-print("hoo")
+# print("hoo")
