@@ -17,20 +17,20 @@ dl_dir = os.getcwd()
 def get_filename_from_url(url):
 	return urllib.parse.urlsplit(url).path.split('/')[-1]
 
-def download(url, start, this_chunk_size, part, tmp_dir):
+def download(url, start, this_chunk_size, part, tmp_dir,chunksize):
 	r = requests.get(url, headers={'Range':'bytes=%d-%d' % (start, start + this_chunk_size-1)}, stream=True)
 	filename = '_%d' % part + get_filename_from_url(url)
 	filepath = os.path.join(tmp_dir, filename)
 	print( 'Downloading %s' % filepath)
 	with open(filepath, 'wb') as f:
-		for chunk in r.iter_content(chunk_size=1024):
+		for chunk in r.iter_content(chunk_size=chunksize):
 			if chunk:
 				f.write(chunk)
 	# f = open(os.path.join(tmp_dir, '_%d' % part + 'done'), "wb")
 	# f.write("Now the file has more content!")
 	print( 'Downloaded %s' % filepath)
 
-def downloader(url,conns): #, dl_dir):
+def downloader(url,conns,chunksize): #, dl_dir):
 	# check if URL accept ranges
 	if(url == ''):
 		return
@@ -46,7 +46,7 @@ def downloader(url,conns): #, dl_dir):
 		filename = get_filename_from_url(url)
 		filepath = os.path.join(dl_dir, filename)
 		with open(filepath, 'wb') as f:
-			for chunk in r.iter_content(chunk_size=1024):
+			for chunk in r.iter_content(chunk_size=chunksize):
 				if chunk:
 					f.write(chunk)
 		return( 'Downloaded %s' % filepath)
@@ -61,7 +61,7 @@ def downloader(url,conns): #, dl_dir):
 	for start in range(0, size, int(chunk_size)):
 		part = len(threads)
 		this_chunk_size = chunk_size if part != conns-1 else chunk_size + remainder
-		t = threading.Thread(target=download, args=(url, start, this_chunk_size, part, tmp_dir))
+		t = threading.Thread(target=download, args=(url, start, this_chunk_size, part, tmp_dir,chunksize))
 		threads.append(t)
 		t.daemon = True
 		t.start()
@@ -87,11 +87,11 @@ def downloader(url,conns): #, dl_dir):
 
 	return 'Joining complete. File saved in ' + filepath
 
-def download_links(urls,conns):
+def download_links(urls,conns,chunksize):
 	# start = time.time()
 	url_list = [boi.strip() for boi in urls.split(',')]
 	for boi in url_list:
-		downloader(boi,conns)
+		downloader(boi,conns,chunksize)
 	print("Downloads completed!")
 	# end=time.time()
 	# print("Total time taken for download ",end-start)
